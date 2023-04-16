@@ -46,6 +46,7 @@ class VenueReservation:
                     service = Service(executable_path=r"C:\Program Files (x86)\Microsoft\Edge\Application\edgedriver_win64\msedgedriver.exe")
                     options = Options()
                     options.binary_location = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+                    options.use_chromium = True
                     options.add_argument("--disable-usb-keyboard-detect")
                     options.add_argument("--disable-extensions")
                     # options.add_argument("--headless")
