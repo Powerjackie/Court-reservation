@@ -1,10 +1,12 @@
 import cv2
 import numpy as np
+import pytesseract
 
+config = r'--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789'
 class ImagePreprocessor:
     
     def __init__(self):
-        pass
+        self.config = config
     
     def preprocess_image(self, image_path):
         img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
@@ -23,5 +25,6 @@ class ImagePreprocessor:
         img = cv2.medianBlur(img, 5)  
         # 将数字放大到合适的尺寸
         img = cv2.resize(img, (0,0), fx=3.5, fy=3.5, interpolation=cv2.INTER_CUBIC)
-        # 返回处理后的图片
-        return img
+        captcha_text = pytesseract.image_to_string(img, config = self.config)
+        # 返回处理后的数字
+        return captcha_text
