@@ -1,3 +1,6 @@
+# Luo Y
+# 2023-04-18
+# -*- coding: utf-8 -*-
 import cv2
 import numpy as np
 import pytesseract

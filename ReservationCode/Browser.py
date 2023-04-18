@@ -1,3 +1,6 @@
+# Luo Y
+# 2023-04-18
+# *-* coding: utf-8 *-*
 import time
 import threading
 from selenium import webdriver
@@ -12,7 +15,7 @@ class Browser:
     _lock = threading.Lock()
 
     @classmethod
-    def get_driver(cls, executable_path, binary_location, IMPLICIT_TIME,WAIT_TIME,headless):
+    def get_driver(cls, executable_path, binary_location, IMPLICIT_TIME,headless):
         with cls._lock:
             try:
                 if cls._driver is None:
@@ -25,14 +28,13 @@ class Browser:
                     options.add_argument("--disable-extensions")
                     if headless:
                         options.add_argument("--headless")
-                    cls._driver = webdriver.Edge(service=service, options=options)
-                    wait = WebDriverWait(cls._driver, WAIT_TIME)
+                    cls._driver = webdriver.Edge(service=service, options=options,keep_alive=True)
                     cls._driver.implicitly_wait(IMPLICIT_TIME)  # 设置隐式等待时间
                     end_time = time.time()
                     print("Browser started in {:.2f} seconds".format(end_time - start_time))
             
             except Exception as e:
-                print(f"Error creating driver: {e}")
+                print(f"Error creating driver")
 
         return cls._driver
 
@@ -40,7 +42,8 @@ class Browser:
     def close_browser(cls):
         if cls._driver is not None:
             try:
+                input("Press any key to close browser")
                 cls._driver.quit()
                 cls._driver = None
             except Exception as e:
-                print(f"Error closing browser: {e}")
+                print(f"Error closing browser")

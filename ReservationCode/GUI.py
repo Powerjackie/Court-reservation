@@ -1,11 +1,15 @@
+# Luo Y
+# 2023-04-18、
+# -*- coding: utf-8 -*-
 import csv
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout,QLabel
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout,QLabel,QWidget, QLabel
 
 
 class CourtSelection(QWidget):
 
-    def __init__(self, dict_path):
+    def __init__(self, dict_path,image_path):
         super().__init__()
         self.selected_court_1 = None
         self.selected_court_2 = None
@@ -16,14 +20,22 @@ class CourtSelection(QWidget):
         p.setColor(self.backgroundRole(), Qt.white)
         self.setPalette(p)
 
+        # 添加图片
+        image_label = QLabel(self)
+        pixmap = QPixmap(image_path)
+        image_label.setPixmap(pixmap)
+        image_label.setGeometry(0,0 , pixmap.width(), pixmap.height())
+
+
+
         # 初始化40个按钮
         self.buttons = {}
         for i in range(15, 20):
             for j in range(1, 9):
                 key = f"{i}_{j}"
                 button = QPushButton(key, self)
-                button.setFixedSize(100, 100)
-                button.setStyleSheet("background-color: black")
+                button.setFixedSize(100, 55)
+                button.setStyleSheet("background-color: #808080; color: #000080;")
                 self.buttons[key] = button
 
         # 添加时间段和日期注释
@@ -40,12 +52,12 @@ class CourtSelection(QWidget):
         day_labels = ['时间段', '1号', '2号', '3号', '4号', '5号', '6号', '7号', '8号']
         for i, label in enumerate(time_labels):
             time_label = QLabel(label, self)
-            time_label.setStyleSheet("background-color: white; color: black;")
+            time_label.setStyleSheet("background-color:#808080; color: #FFFF00;")
             time_label.setAlignment(Qt.AlignCenter)
             self.grid.addWidget(time_label, i, 0)
         for i, label in enumerate(day_labels):
             day_label = QLabel(label, self)
-            day_label.setStyleSheet("background-color: white; color: black;")
+            day_label.setStyleSheet("background-color: #808080 ; color: #FFFF00 ;")
             day_label.setAlignment(Qt.AlignCenter)
             self.grid.addWidget(day_label, 0, i)
 
@@ -58,7 +70,7 @@ class CourtSelection(QWidget):
        
         # 设置窗口标题和字体颜色
         self.setWindowTitle('Court Selection')
-        self.setStyleSheet("color: black; background-color: white")
+        self.setStyleSheet("color: #008080; background-color: #808000 ")
         self.show()
 
     def read_dict(self):
