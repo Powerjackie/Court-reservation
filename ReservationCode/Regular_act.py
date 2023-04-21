@@ -17,13 +17,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 import os
 import configparser
+from selenium.webdriver.support.ui import Select
 
 # 获取当前文件所在目录的绝对路径,构造相对路径
-current_dir = os.path.dirname(os.path.abspath(__file__))
-config_file_path = os.path.join(current_dir, 'config.ini')
+config_path = os.path.join(os.path.dirname(__file__), 'data/common/hidden/inside/locators.ini')
 # 读取配置文件
 config = configparser.ConfigParser()
-with open(config_file_path, encoding='utf-8') as f:
+with open(config_path, encoding='utf-8') as f:
     config.read_file(f)
 
 time = config['time']
@@ -128,3 +128,14 @@ class elementselector:
             element.submit()
 
         return element
+
+
+    def select_option_element(self,element, locator,  select_option=None):
+                """
+                选择下拉列表选项
+                :param locator: 下拉列表元素的定位表达式
+                :param select_option: 需要选择的下拉选项
+                """
+                if select_option is not None:
+                    select = Select(element)
+                    select.select_by_value(locator)

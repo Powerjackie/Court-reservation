@@ -1,17 +1,22 @@
+# Luo Y
+# 2023-04-20
+# -*- coding: utf-8 -*-
 import time
 import logging
 from selenium.common.exceptions import TimeoutException,NoSuchElementException,ElementNotSelectableException
 from Check import check_courts
 from Regular_act import elementselector
-# -*- coding: utf-8 -*-
+
 
 # 设置logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class VenueReservation:
+ 
+     
     def __init__(self, venue, agreement, sports, badminton, forward, refresh, 
-                    reservation, companion_1, companion_2, submit,
-                        driver,xpath_1, xpath_2):
+                    reservation,submit_res, companion_1, companion_2, submit,
+                        driver,xpath_1, xpath_2,court_dict):
         self.venue = venue
         self.agreement = agreement
         self.sports = sports
@@ -19,21 +24,29 @@ class VenueReservation:
         self.forward = forward
         self.refresh = refresh
         self.reservation = reservation
+        self.submit_res = submit_res
         self.companion_1 = companion_1
         self.companion_2 = companion_2
         self.submit = submit
         self.xpath_1 = xpath_1
         self.xpath_2 = xpath_2
+        self.court_dict = court_dict
         self.driver = driver
-        self.select_court = check_courts(self.driver,xpath_1, xpath_2)
         self.inter = elementselector(self.driver)
-        self.checker = check_courts(driver=self.driver, xpath_1=self.xpath_1, 
-                                     xpath_2=self.xpath_2)
+        self.checker = check_courts(driver=self.driver)
     
             
-    def reserve_at_8am(self, dict_path):
-        self.dict_path = dict_path
-        self.selected_courts = []
+    def reserve_at_8am(self,court_1: str, court_2: str) -> None:
+        """
+        预约场馆。
+        
+        参数：
+        court_1: 第一个场地
+        court_2: 第二个场地
+        
+        返回值：
+        None
+        """
         def select_court_if_available(locator):
             """
             如果场地可选，则选择场地并将其添加到已选列表中
@@ -42,17 +55,23 @@ class VenueReservation:
             # 判断场地是否被选择
             def is_court_available(court):
                 try:
-                    return "reserved" not in court
-                except TypeError as e:
-                    print(f"TypeError")
+                    return "free"  in court
+                except TypeError:
+                    print(f"找不到场地")
                 
-            court = self.inter.interact_element(locator=locator, wait_type=None, get_attribute='class')
+            court = self.inter.interact_element(locator=locator,  get_attribute='class')
             if is_court_available(court):
-                selected_court = self.inter.interact_element(locator=self.xpath_2, wait_type=None)
+                selected_court = self.inter.interact_element(locator=locator,n=3)
                 logging.info(f"已选择场地：{selected_court}")
                 self.selected_courts.append(selected_court)
+        self.selected_courts = []
+        self.court_1 = court_1
+        self.court_2 = court_2
+        print(court_1) # 检查第一个场地是否正确
+        print(court_2) # 检查第二个场地是否正确
+       
 
-
+        
         try:
             # 点击菜单进入场馆预约页面
             self.inter.interact_element(locator=self.venue,n=2,enabled=True)
@@ -87,23 +106,24 @@ class VenueReservation:
 
                 except TimeoutException as e:
                     logging.error(f"出现错误")
-                
+
                 try:
-                    if select_court_if_available( self.xpath_1):
-                        print("已选择场地1")
-                    if select_court_if_available(self.xpath_2):
-                        print("已选择场地2")  
-                    self.checker.select_courts(self.dict_path,self.selected_courts)
-                
+                    select_court_if_available(locator=self.xpath_1)
+                    select_court_if_available(locator=self.xpath_2)                    
+                    # 调用检查方法判断是否还要选择场地        
+                    self.checker.select_courts(self.selected_courts,self.court_dict)
+            
                 except TimeoutException as e:
                     logging.error(f"出现错误")
-                            
-                        
+                                                   
                 for _ in range(5):
                     try:
                         # 点击我要预约
                         self.inter.interact_element(
                             locator=self.reservation, n=2)  
+                        
+                        # 等待提交预约界面出现
+                        self.inter.interact_element(locator=self.submit_res,visible=True)
                 
                         # 隐式等待，勾选第一个同伴
                         self.inter.interact_element(
@@ -118,13 +138,14 @@ class VenueReservation:
                             locator=self.submit, n=2)
 
                     except Exception as e:
-                        logging.error("出现错误，正在重新尝试点击...")
+                        logging.error("出现错误，正在重新尝试...")
                         continue
                     break
-                else:
-                     return self.driver
+
             break
-        return self.driver
+    
+
+
 
 
         
