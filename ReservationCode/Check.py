@@ -2,7 +2,7 @@
 # *-* coding: utf-8 *-*
 # 2023.4.17
 import random
-from Regular_act import elementselector
+from Browser import elementselector
 
 class check_courts:
     def __init__(self, driver):

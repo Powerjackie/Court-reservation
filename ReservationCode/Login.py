@@ -4,7 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import os
 from preprocess import ImagePreprocessor
-from Regular_act import elementselector
+from Browser import elementselector
 # -*- coding: utf-8 -*-
 
 class loginhandler:

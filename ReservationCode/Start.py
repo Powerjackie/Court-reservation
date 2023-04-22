@@ -5,7 +5,7 @@ def main():
     import sys
     import os
     import configparser
-    from Browser import Browser
+    from Browser import initialize
     from PyQt5.QtWidgets import QApplication
     from GUI import CourtSelection
     from Reservation import VenueReservation
@@ -24,7 +24,7 @@ def main():
     login = config['login']
     xpath = config['Xpath']
     id = config['id']
-    time = config['time']
+    
 
     username = login['username']
     password = login['password']
@@ -48,26 +48,24 @@ def main():
     companion_1 = xpath['companion_1']
     companion_2 = xpath['companion_2']
     submit = xpath['submit']
-    IMPLICIT = int(time['IMPLICIT_WAIT'])   
 
     driver = None   # 定义全局变量
-
-
+    
     # 实例化QApplication类并调用
     app = QApplication(sys.argv)
     court_selection = CourtSelection()
     court_selection.show()
     app.exec_()
-    
       
     xpath_1, xpath_2,headless,court_1,court_2,court_dict = court_selection.get_info()
     if xpath_1 != None and xpath_2 != None:
-        try:
+        try:          
             # 实例化浏览器实例
-            driver = Browser.get_driver(IMPLICIT,headless)
+            driver = initialize.get_driver(headless)
+            print(driver)
 
             # 初始化LoginHandler和Reservation类，传入浏览器实例
-            login_handler = loginhandler(username, password,website, user, pwd, img, cap, log, login_button,driver)       
+            login_handler = loginhandler(username, password,website, user, pwd, img, cap, log, login_button,driver=driver)       
             reservation = VenueReservation(venue, agreement, sports, badminton,
                             forward, ref, res,submit_res, companion_1, companion_2, 
                             submit, driver, xpath_1, xpath_2,court_dict)
@@ -80,7 +78,7 @@ def main():
             raise
 
         finally:
-            Browser.close_browser()
+            initialize.close_browser()
 
 if __name__ == '__main__':
     main()
