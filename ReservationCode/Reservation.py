@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 import time
 import logging
-from selenium.common.exceptions import TimeoutException,NoSuchElementException,ElementNotSelectableException
+from selenium.common.exceptions import TimeoutException
 from Check import check_courts
 from Browser import elementselector
 
@@ -14,29 +14,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 class VenueReservation:
  
      
-    def __init__(self, venue, agreement, sports, badminton, forward, refresh, 
-                    reservation,submit_res, companion_1, companion_2, submit,
-                        driver,xpath_1, xpath_2,court_dict):
-        self.venue = venue
-        self.agreement = agreement
-        self.sports = sports
-        self.badminton = badminton
-        self.forward = forward
-        self.refresh = refresh
-        self.reservation = reservation
-        self.submit_res = submit_res
-        self.companion_1 = companion_1
-        self.companion_2 = companion_2
-        self.submit = submit
-        self.xpath_1 = xpath_1
-        self.xpath_2 = xpath_2
-        self.court_dict = court_dict
+    def __init__(self, driver):
         self.driver = driver
         self.inter = elementselector(self.driver)
         self.checker = check_courts(driver=self.driver)
     
             
-    def reserve_at_8am(self,court_1: str, court_2: str) -> None:
+    def reserve_at_8am(self,court_1, court_2,venue, agreement, sports, badminton, forward, refresh, 
+                    reservation,submit_res, companion_1, companion_2, submit,xpath_1, xpath_2,court_dict):
         """
         预约场馆。
         
@@ -47,6 +32,7 @@ class VenueReservation:
         返回值：
         None
         """
+        self.selected_courts = []
         def select_court_if_available(locator):
             """
             如果场地可选，则选择场地并将其添加到已选列表中
@@ -61,28 +47,22 @@ class VenueReservation:
                 
             court = self.inter.interact_element(locator=locator,  get_attribute='class')
             if is_court_available(court):
-                selected_court = self.inter.interact_element(locator=locator,n=3)
+                selected_court = self.inter.interact_element(locator=locator,n=2)
                 logging.info(f"已选择场地：{selected_court}")
                 self.selected_courts.append(selected_court)
-        self.selected_courts = []
-        self.court_1 = court_1
-        self.court_2 = court_2
-        print(court_1) # 检查第一个场地是否正确
-        print(court_2) # 检查第二个场地是否正确
-       
-
+        
         
         try:
             # 点击菜单进入场馆预约页面
-            self.inter.interact_element(locator=self.venue,n=2,enabled=True)
+            self.inter.interact_element(locator=venue,n=2,enabled=True)
             # 勾选协议
-            self.inter.interact_element(locator=self.agreement,n=2)
+            self.inter.interact_element(locator=agreement,n=2)
             # 点击综合馆
-            self.inter.interact_element(locator=self.sports,n=2,enabled=True)
+            self.inter.interact_element(locator=sports,n=2,enabled=True)
             # 点击羽毛球馆
-            self.inter.interact_element(locator=self.badminton,n=2,enabled=True)
+            self.inter.interact_element(locator=badminton,n=2,enabled=True)
             # 点击往后一天
-            self.inter.interact_element(locator=self.forward,n=1)
+            self.inter.interact_element(locator=forward,n=1)
 
         except TimeoutException:
             return None
@@ -100,46 +80,42 @@ class VenueReservation:
                 # 预约操作
                 try:
                     # 点击往后按钮
-                    self.inter.interact_element(locator=self.forward,n=2)
+                    self.inter.interact_element(locator=forward,n=2)
 
                     # 刷新，确保场地可选
-                    self.inter.interact_element(locator=self.refresh,n=2)
+                    self.inter.interact_element(locator=refresh,n=2)
 
                 except TimeoutException as e:
-                    logging.error(f"出现错误")
+                    logging.info(f"出现错误reser108")
 
                 try:
-                    select_court_if_available(locator=self.xpath_1)
-                    select_court_if_available(locator=self.xpath_2)                    
+                    select_court_if_available(locator=xpath_1)
+                    select_court_if_available(locator=xpath_2)                    
                     # 调用检查方法判断是否还要选择场地        
-                    self.checker.select_courts(self.selected_courts,self.court_dict)
+                    self.checker.select_courts(self.selected_courts,court_dict)
 
                     # 点击我要预约
-                    self.inter.interact_element(
-                        locator=self.reservation, n=2)  
+                    self.inter.interact_element(locator=reservation, n=2)  
         
                 except TimeoutException as e:
-                    logging.error(f"出现错误")                                              
+                    logging.info(f"出现错误,reser121")                                              
                 
-                for _ in range(5):
+                for _ in range(3):
                     try:               
-                
                         # 隐式等待，勾选第一个同伴
-                        self.inter.interact_element(
-                            locator=self.companion_1,wait_type='implicit', n=2)
+                        self.inter.interact_element(locator=companion_1,wait_type='implicit', n=2)
 
                         # 显示等待，勾选第二个同伴    
-                        self.inter.interact_element(
-                            locator=self.companion_2, n=2)           
+                        self.inter.interact_element(locator=companion_2, n=2)           
 
                         # 提交订单
-                        self.inter.interact_element(
-                            locator=self.submit, n=2)               
-
+                        self.inter.interact_element(locator=submit, n=2)               
 
                     except Exception as e:
                         logging.error("出现错误，正在重新尝试...")
+                        time.sleep(1)
                         continue
+
             break
 
         

@@ -23,7 +23,6 @@ def get_config(section_name, config_path=None):
 
 def main():
     import sys
-    import os
     from Browser import initialize
     from PyQt5.QtWidgets import QApplication
     from GUI import CourtSelection
@@ -39,11 +38,9 @@ def main():
     xpath = get_config('Xpath', locators_path)
     id = get_config('id', locators_path)
     
-
     username = login['username']
     password = login['password']
-    website = website
-    ['website']
+    website = website['website']
     user = id['user']
     pwd = id['pwd']
     img = id['img']
@@ -75,21 +72,19 @@ def main():
         try:          
             # 实例化浏览器实例
             driver = initialize.get_driver(headless)
-            print(driver)
 
             # 初始化LoginHandler和Reservation类，传入浏览器实例
-            login_handler = loginhandler(username, password,website, user, pwd, img, cap, log, login_button,driver=driver)       
-            reservation = VenueReservation(venue, agreement, sports, badminton,
-                            forward, ref, res,submit_res, companion_1, companion_2, 
-                            submit, driver, xpath_1, xpath_2,court_dict)
+            login_handler = loginhandler(driver=driver)       
+            reservation = VenueReservation( driver)
     
             # 登录
-            login_handler.login_action()
+            login_handler.login_action(username, password,website, user, pwd,log, login_button,img, cap)
             # 预约        
-            reservation.reserve_at_8am(court_1,court_2)
-            print("预约成功")
+            reservation.reserve_at_8am(court_1,court_2,venue, agreement, sports, badminton,
+                            forward, ref, res,submit_res, companion_1, companion_2, 
+                            submit, xpath_1, xpath_2,court_dict)
             initialize.close_browser()
-
+        
         except Exception as e:
             print(" ")
 

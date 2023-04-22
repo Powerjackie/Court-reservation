@@ -3,26 +3,18 @@
 # *-* coding: utf-8 *-*
 import time
 import threading
+import os
+import logging
 from selenium import webdriver
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.options import Options
-import os
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import (
-    InvalidArgumentException,
-    TimeoutException,
-    NoSuchElementException,
-    StaleElementReferenceException,
-    ElementNotInteractableException,
-    ElementClickInterceptedException,
-    ElementNotSelectableException,
-    MoveTargetOutOfBoundsException,
-)
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 from Start import get_config
+
 # 构造webdriver相对路径，获取当前文件所在目录的绝对路径,构造相对路径
 executable_path = os.path.join(os.path.dirname(__file__), 'config/driver/msedgedriver.exe')
 config_path = os.path.join(os.path.dirname(__file__), 'data/common/hidden/inside/locators.ini')
@@ -104,26 +96,23 @@ class elementselector:
             if visible:
                 try:
                     element = self.wait.until(EC.visibility_of_element_located((getattr(By, locator_type.upper()), locator)))
-                except (TimeoutException, InvalidArgumentException, NoSuchElementException, StaleElementReferenceException, ElementNotInteractableException, ElementClickInterceptedException, ElementNotSelectableException, MoveTargetOutOfBoundsException):
-                    return None
+                except Exception as e:
+                    logging.info(f"Error: {e}")
             elif enabled:
                 try:
                     element = self.wait.until(EC.element_to_be_clickable((getattr(By, locator_type.upper()), locator)))
-                except (TimeoutException, InvalidArgumentException, NoSuchElementException, StaleElementReferenceException,
-                         ElementNotInteractableException, ElementClickInterceptedException, ElementNotSelectableException, MoveTargetOutOfBoundsException):
-                    return None
+                except Exception as e:
+                    logging.info(f"Error: {e}")
             elif selected:
                 try:
                     element = self.wait.until(EC.element_to_be_selected((getattr(By, locator_type.upper()), locator)))
-                except (TimeoutException, InvalidArgumentException, NoSuchElementException, StaleElementReferenceException, 
-                        ElementNotInteractableException, ElementClickInterceptedException, ElementNotSelectableException, MoveTargetOutOfBoundsException):
-                    return None
+                except Exception as e:
+                    logging.info(f"Error: {e}")
             else:
                 try:
                     element = self.wait.until(EC.presence_of_element_located((getattr(By, locator_type.upper()), locator)))
-                except (TimeoutException, InvalidArgumentException, NoSuchElementException, 
-                        StaleElementReferenceException, ElementNotInteractableException, ElementClickInterceptedException, ElementNotSelectableException, MoveTargetOutOfBoundsException):
-                    return None
+                except Exception as e:
+                    logging.info(f"Error: {e}")
 
         if switch is not None:
             if switch == 'default':
@@ -138,23 +127,22 @@ class elementselector:
             try:
                 element.click()
             except UnboundLocalError:
-                print("Error: Local variable 'element' is not associated with a value.")
-                return None
+                logging.info(f"Error: {e}")
         elif n == 2:
             try:
                 self.driver.execute_script("arguments[0].click();", element)
-            except (InvalidArgumentException, StaleElementReferenceException, ElementNotInteractableException, ElementClickInterceptedException):
-                return None
+            except Exception as e:
+                logging.info(f"Error: {e}")
         elif n == 3:
             try:
                 ActionChains(self.driver).click(element).perform()
-            except (InvalidArgumentException, StaleElementReferenceException, ElementNotInteractableException, ElementClickInterceptedException):
-                return None
+            except Exception as e:
+                logging.info(f"Error: {e}")
         if clear:
             try:
                 element.clear()
-            except (InvalidArgumentException, StaleElementReferenceException, ElementNotInteractableException):
-                return None
+            except Exception as e:
+                logging.info(f"Error: {e}")
 
         if input_text is not None:
             if clear:
