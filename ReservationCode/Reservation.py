@@ -5,7 +5,7 @@ import time
 import logging
 from selenium.common.exceptions import TimeoutException,NoSuchElementException,ElementNotSelectableException
 from Check import check_courts
-from Regular_act import elementselector
+from Browser import elementselector
 
 
 # 设置logging
