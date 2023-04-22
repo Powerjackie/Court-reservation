@@ -45,7 +45,7 @@ class Browser:
     def close_browser(cls):
         if cls._driver is not None:
             try:
-                input("Press any key to close browser")
+                input("点击任意键关闭浏览器")
                 cls._driver.quit()
                 cls._driver = None
             except Exception as e:

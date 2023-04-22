@@ -93,6 +93,7 @@ class VenueReservation:
             if current_time.tm_hour < 8:
                 logging.info('还没到8点，等待中...')
                 time.sleep(1)  # 等待三秒
+                continue
             else:
                 logging.info('已到8点，开始进行预约操作')
 
@@ -112,22 +113,20 @@ class VenueReservation:
                     select_court_if_available(locator=self.xpath_2)                    
                     # 调用检查方法判断是否还要选择场地        
                     self.checker.select_courts(self.selected_courts,self.court_dict)
-            
+
+                    # 点击我要预约
+                    self.inter.interact_element(
+                        locator=self.reservation, n=2)  
+        
                 except TimeoutException as e:
-                    logging.error(f"出现错误")
-                                                   
+                    logging.error(f"出现错误")                                              
+                
                 for _ in range(5):
-                    try:
-                        # 点击我要预约
-                        self.inter.interact_element(
-                            locator=self.reservation, n=2)  
-                        
-                        # 等待提交预约界面出现
-                        self.inter.interact_element(locator=self.submit_res,visible=True)
+                    try:               
                 
                         # 隐式等待，勾选第一个同伴
                         self.inter.interact_element(
-                            locator=self.companion_1,wait_type=None, n=2)
+                            locator=self.companion_1,wait_type='implicit', n=2)
 
                         # 显示等待，勾选第二个同伴    
                         self.inter.interact_element(
@@ -135,14 +134,15 @@ class VenueReservation:
 
                         # 提交订单
                         self.inter.interact_element(
-                            locator=self.submit, n=2)
+                            locator=self.submit, n=2)               
+
 
                     except Exception as e:
                         logging.error("出现错误，正在重新尝试...")
                         continue
-                    break
-
             break
+
+        
     
 
 
